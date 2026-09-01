@@ -40,12 +40,28 @@ def run() -> None:
             "submission_id": "self-test",
             "submitted_at": "2026-09-01T09:00:00+07:00",
             "barcode": "8850127000016",
+            "location": {
+                "branch": "TEST",
+                "floor": "ชั้น 1",
+                "zone": "ทางเดิน 1",
+                "map_x": 2,
+                "map_y": 3,
+            },
         }
         result = store.save_submission(metadata, prepared.data)
         assert len(store.list_submissions()) == 1
         assert store.get_file_bytes(result.image_path) == prepared.data
+        moved = dict(metadata)
+        moved["submission_id"] = "self-test-moved"
+        moved["submitted_at"] = "2026-09-01T09:05:00+07:00"
+        moved["location"] = dict(metadata["location"], zone="ทางเดิน 2", map_x=7)
+        moved_result = store.save_submission(moved, prepared.data)
+        assert moved_result.location_changed
+        assert moved_result.previous_location["zone"] == "ทางเดิน 1"
+        assert store.get_current_location("8850127000016")["location"]["zone"] == "ทางเดิน 2"
+        assert len(store.list_submissions()) == 2
 
-    print("TKK safe self-test OK - v2.0.0")
+    print("TKK safe self-test OK - v2.1.0")
 
 
 if __name__ == "__main__":

@@ -37,6 +37,8 @@ class FakeGitHubSession:
             return FakeResponse(200, {"object": {"sha": "parent-sha"}})
         if method == "GET" and path == "/git/commits/parent-sha":
             return FakeResponse(200, {"tree": {"sha": "base-tree"}})
+        if method == "GET" and path.startswith("/contents/submissions/_locations/"):
+            return FakeResponse(404, {"message": "Not Found"})
         if method == "POST" and path == "/git/trees":
             self.tree_payload = json
             return FakeResponse(201, {"sha": "new-tree"})
@@ -89,14 +91,55 @@ class StorageTests(unittest.TestCase):
             "submission_id": "test-001",
             "submitted_at": "2026-09-01T10:20:30+07:00",
             "barcode": "8850127000016",
+            "location": {
+                "branch": "MAIN",
+                "floor": "ชั้น 1",
+                "zone": "ทางเดิน 1",
+                "map_x": 2,
+                "map_y": 3,
+            },
         }
         result = store.save_submission(metadata, b"jpeg-data")
         self.assertEqual(result.commit_sha, "new-commit")
-        self.assertEqual(session.blob_count, 2)
+        self.assertEqual(session.blob_count, 3)
         paths = [item["path"] for item in session.tree_payload["tree"]]
-        self.assertEqual(len(paths), 2)
+        self.assertEqual(len(paths), 3)
         self.assertTrue(any(path.endswith(".jpg") for path in paths))
-        self.assertTrue(any(path.endswith(".json") for path in paths))
+        self.assertTrue(any("/_locations/" in path for path in paths))
+
+    def test_local_store_moves_current_location_and_preserves_history(self):
+        first = {
+            "submission_id": "first",
+            "submitted_at": "2026-09-01T10:20:30+07:00",
+            "barcode": "8850127000016",
+            "location": {
+                "branch": "MAIN",
+                "floor": "ชั้น 1",
+                "zone": "ทางเดิน 1",
+                "aisle": "1",
+                "rack": "A",
+                "shelf": "2",
+                "map_x": 2,
+                "map_y": 3,
+            },
+        }
+        first_result = self.store.save_submission(first, b"first-image")
+        self.assertFalse(first_result.location_changed)
+
+        second = dict(first)
+        second["submission_id"] = "second"
+        second["submitted_at"] = "2026-09-01T10:25:30+07:00"
+        second["location"] = dict(first["location"], zone="ทางเดิน 4", map_x=8, map_y=7)
+        second_result = self.store.save_submission(second, b"second-image")
+
+        self.assertTrue(second_result.location_changed)
+        self.assertEqual(second_result.previous_location["zone"], "ทางเดิน 1")
+        self.assertEqual(second_result.current_location["zone"], "ทางเดิน 4")
+        current = self.store.get_current_location("8850127000016")
+        self.assertEqual(current["location"]["zone"], "ทางเดิน 4")
+        records = self.store.list_submissions()
+        self.assertEqual(len(records), 2)
+        self.assertTrue(records[0]["location_changed"])
 
     def test_github_refuses_public_repository(self):
         store = GitHubSubmissionStore(

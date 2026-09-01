@@ -25,9 +25,16 @@ from storage import (
     StorageConfigurationError,
     StorageError,
 )
+from store_map import (
+    current_product_locations,
+    location_label,
+    normalize_location,
+    parse_store_zones,
+    store_map_svg,
+)
 
 
-APP_VERSION = "2.0.0"
+APP_VERSION = "2.1.0"
 BASE_DIR = Path(__file__).resolve().parent
 BANGKOK_TZ = timezone(timedelta(hours=7), name="Asia/Bangkok")
 
@@ -86,6 +93,10 @@ def inject_brand_style() -> None:
         }
         .tkk-step { color:#0969ff; font-weight:800; font-size:.8rem; letter-spacing:.06em; }
         .tkk-note { color:#667085; font-size:.92rem; }
+        .tkk-location {
+            border-left:5px solid #ff6900; background:#fff7f0; border-radius:14px;
+            padding:12px 15px; margin:10px 0 14px; color:#041328;
+        }
         .stButton > button, .stDownloadButton > button {
             border-radius:12px; min-height:44px; font-weight:750;
         }
@@ -194,7 +205,7 @@ def submission_page() -> None:
     store, info, error = storage_status()
     st.markdown('<div class="tkk-step">01 • PRODUCT INTAKE</div>', unsafe_allow_html=True)
     st.title("ส่งรูปสินค้าเข้าบริษัท")
-    st.caption("ใช้รูปที่ถ่ายชัด เห็นสินค้าครบ และกรอกรหัสใต้บาร์โค้ด 13 หลัก")
+    st.caption("ถ่ายรูปให้ชัด กรอกรหัส 13 หลัก และระบุตำแหน่งจริงบนแผนที่ร้าน")
     if error:
         st.error(f"ยังส่งข้อมูลไม่ได้: {error}")
     elif info:
@@ -218,14 +229,42 @@ def submission_page() -> None:
         left, right = st.columns(2)
         with left:
             employee_name = st.text_input("ชื่อพนักงาน *", max_chars=100)
-            department = st.text_input("แผนก/สาขา *", max_chars=100)
+            department = st.text_input("แผนก (ถ้ามี)", max_chars=100)
         with right:
+            branch = st.text_input("ชื่อสาขา/ร้าน *", max_chars=100)
             barcode = st.text_input(
                 "รหัสสินค้า 13 หลัก *",
                 max_chars=20,
                 placeholder="เช่น 8851234567890",
             )
-            product_name = st.text_input("ชื่อสินค้า (ถ้ามี)", max_chars=160)
+        product_name = st.text_input("ชื่อสินค้า (ถ้ามี)", max_chars=160)
+
+        st.markdown("#### ตำแหน่งสินค้าบนแผนที่ร้าน")
+        st.caption("เลือกตำแหน่งที่ยืนถ่ายรูปจริง ถ้ารหัสเดิมถูกส่งจากตำแหน่งใหม่ ระบบจะย้ายหมุดให้อัตโนมัติ")
+        map_left, map_right = st.columns(2)
+        with map_left:
+            floor = st.text_input("ชั้น/อาคาร *", value="ชั้น 1", max_chars=60)
+            zone = st.selectbox(
+                "โซนสินค้า *",
+                parse_store_zones(setting("STORE_MAP_ZONES")),
+            )
+        with map_right:
+            aisle = st.text_input("หมายเลขทางเดิน (ถ้ามี)", max_chars=40)
+            rack = st.text_input("ชั้นวาง/ตู้ (ถ้ามี)", max_chars=40)
+        shelf = st.text_input("ช่อง/ระดับชั้น (ถ้ามี)", max_chars=40)
+        coordinate_left, coordinate_right = st.columns(2)
+        with coordinate_left:
+            map_x = st.select_slider(
+                "แนวนอน: ซ้าย 1 → ขวา 10",
+                options=list(range(1, 11)),
+                value=5,
+            )
+        with coordinate_right:
+            map_y = st.select_slider(
+                "แนวลึก: หน้าร้าน 1 → หลังร้าน 10",
+                options=list(range(1, 11)),
+                value=5,
+            )
         note = st.text_area("หมายเหตุ (ถ้ามี)", max_chars=500, height=80)
         consent = st.checkbox("ยืนยันว่ารูปและข้อมูลนี้ใช้สำหรับงานของบริษัท")
         submitted = st.form_submit_button(
@@ -247,8 +286,10 @@ def submission_page() -> None:
         errors.append(barcode_message)
     if not employee_name.strip():
         errors.append("กรุณาพิมพ์ชื่อพนักงาน")
-    if not department.strip():
-        errors.append("กรุณาพิมพ์แผนกหรือสาขา")
+    if not branch.strip():
+        errors.append("กรุณาพิมพ์ชื่อสาขาหรือร้าน")
+    if not floor.strip() or not zone.strip():
+        errors.append("กรุณาระบุชั้นและโซนสินค้า")
     if uploaded is None:
         errors.append("กรุณาถ่ายหรือเลือกรูปสินค้า")
     if not consent:
@@ -266,15 +307,29 @@ def submission_page() -> None:
 
     now = datetime.now(BANGKOK_TZ)
     submission_id = f"{now:%Y%m%dT%H%M%S}-{uuid.uuid4().hex[:8]}"
+    location = normalize_location(
+        {
+            "branch": branch,
+            "floor": floor,
+            "zone": zone,
+            "aisle": aisle,
+            "rack": rack,
+            "shelf": shelf,
+            "map_x": map_x,
+            "map_y": map_y,
+        }
+    )
     metadata = {
-        "schema_version": 1,
+        "schema_version": 2,
         "submission_id": submission_id,
         "submitted_at": now.isoformat(timespec="seconds"),
         "barcode": clean_barcode,
         "ean13_validation": "strict" if strict_ean13 else "length_only",
         "employee_name": employee_name.strip(),
         "department": department.strip(),
+        "branch": branch.strip(),
         "product_name": product_name.strip(),
+        "location": location,
         "note": note.strip(),
         "original_filename": prepared.original_name,
         "image_width": prepared.width,
@@ -291,9 +346,24 @@ def submission_page() -> None:
         return
 
     receipt = dict(metadata)
-    receipt.update({"image_path": result.image_path, "metadata_path": result.metadata_path})
+    receipt.update(
+        {
+            "image_path": result.image_path,
+            "metadata_path": result.metadata_path,
+            "location_changed": result.location_changed,
+            "previous_location": result.previous_location,
+        }
+    )
     st.balloons()
     st.success(f"ส่งสำเร็จ • รหัสสินค้า {clean_barcode}")
+    if result.location_changed:
+        st.warning(
+            "ระบบย้ายตำแหน่งสินค้าอัตโนมัติจาก "
+            f"{location_label(result.previous_location)} → {location_label(result.current_location)}"
+        )
+    else:
+        st.info(f"บันทึกตำแหน่งปัจจุบัน: {location_label(result.current_location)}")
+    st.markdown(store_map_svg(result.current_location, title=f"รหัสสินค้า {clean_barcode}"), unsafe_allow_html=True)
     st.image(prepared.data, caption=f"{prepared.width}×{prepared.height} Pixels", width=360)
     st.code(result.submission_id, language=None)
     st.download_button(
@@ -325,7 +395,7 @@ def _admin_login() -> bool:
 
 def admin_page() -> None:
     st.markdown('<div class="tkk-step">02 • ADMIN</div>', unsafe_allow_html=True)
-    st.title("รายการที่พนักงานส่งแล้ว")
+    st.title("รายการและแผนที่สินค้า")
     if not _admin_login():
         return
     store, info, error = storage_status()
@@ -336,7 +406,7 @@ def admin_page() -> None:
         st.rerun()
     try:
         with st.spinner("กำลังอ่านรายการล่าสุด..."):
-            records = store.list_submissions(limit=100)
+            records = store.list_submissions(limit=200)
     except StorageError as exc:
         st.error(str(exc))
         return
@@ -352,17 +422,27 @@ def admin_page() -> None:
             row for row in records
             if needle in " ".join(str(value) for value in row.values()).casefold()
         ]
+    current_locations = current_product_locations(filtered)
     unique_products = len({str(row.get("barcode") or "") for row in filtered})
-    c1, c2, c3 = st.columns(3)
+    moved_count = sum(1 for row in filtered if row.get("location_changed"))
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric("รายการ", len(filtered))
     c2.metric("รหัสสินค้าไม่ซ้ำ", unique_products)
-    c3.metric("ที่เก็บ", str(info.get("repository") or "พร้อมใช้งาน"))
+    c3.metric("มีตำแหน่งบนแผนที่", len(current_locations))
+    c4.metric("ย้ายตำแหน่ง", moved_count)
 
     columns = [
-        "submitted_at", "barcode", "product_name", "employee_name", "department",
-        "note", "original_filename", "image_width", "image_height", "submission_id",
+        "submitted_at", "barcode", "product_name", "employee_name", "department", "branch",
+        "location_label", "location_changed", "note", "original_filename", "submission_id",
     ]
-    table = pd.DataFrame([{key: row.get(key, "") for key in columns} for row in filtered])
+    table_rows: list[dict] = []
+    for row in filtered:
+        flat = {key: row.get(key, "") for key in columns}
+        flat["branch"] = row.get("branch") or normalize_location(row.get("location")).get("branch", "")
+        flat["location_label"] = location_label(row.get("location"))
+        flat["location_changed"] = "ย้ายอัตโนมัติ" if row.get("location_changed") else ""
+        table_rows.append(flat)
+    table = pd.DataFrame(table_rows)
     st.dataframe(table, use_container_width=True, hide_index=True)
     csv_data = table.to_csv(index=False).encode("utf-8-sig")
     st.download_button(
@@ -373,13 +453,40 @@ def admin_page() -> None:
         use_container_width=True,
     )
 
-    labels: dict[str, dict] = {}
-    for row in filtered:
-        label = f"{row.get('barcode', '-')} • {row.get('product_name') or 'ไม่ระบุชื่อ'} • {row.get('submitted_at', '')}"
-        labels[f"{label} • {row.get('submission_id', '')[-8:]}"] = row
-    if labels:
-        selected_label = st.selectbox("ดูรูปสินค้า", list(labels))
+    st.subheader("แผนที่สินค้าปัจจุบัน")
+    if not current_locations:
+        st.info("รายการเดิมยังไม่มีพิกัด แผนที่จะเริ่มแสดงเมื่อพนักงานส่งรูปพร้อมตำแหน่ง")
+        labels = {}
+    else:
+        labels: dict[str, dict] = {}
+        for row in current_locations:
+            label = f"{row.get('barcode', '-')} • {row.get('product_name') or 'ไม่ระบุชื่อ'} • {location_label(row.get('location'))}"
+            labels[label] = row
+        selected_label = st.selectbox("เลือกสินค้าที่ต้องการดูตำแหน่ง", list(labels))
         selected = labels[selected_label]
+        st.info(f"ตำแหน่งปัจจุบัน: {location_label(selected.get('location'))}")
+        st.markdown(
+            store_map_svg(selected.get("location"), title=f"{selected.get('barcode', '')} • {selected.get('product_name') or 'สินค้า'}"),
+            unsafe_allow_html=True,
+        )
+
+        selected_barcode = str(selected.get("barcode") or "")
+        history = [row for row in records if str(row.get("barcode") or "") == selected_barcode]
+        history_table = pd.DataFrame(
+            [
+                {
+                    "วันเวลา": row.get("submitted_at", ""),
+                    "ตำแหน่ง": location_label(row.get("location")),
+                    "ผู้รายงาน": row.get("employee_name", ""),
+                    "สถานะ": "ย้ายตำแหน่งอัตโนมัติ" if row.get("location_changed") else "บันทึกตำแหน่ง",
+                }
+                for row in history
+            ]
+        )
+        with st.expander(f"ประวัติตำแหน่ง {len(history)} รายการ"):
+            st.dataframe(history_table, use_container_width=True, hide_index=True)
+
+        st.subheader("รูปสินค้าล่าสุด")
         try:
             image_bytes = store.get_file_bytes(str(selected.get("image_path") or ""))
             st.image(image_bytes, caption=selected_label, width=500)
@@ -474,9 +581,11 @@ def guide_page() -> None:
             """
             1. เปิดลิงก์ระบบด้วยมือถือและใส่รหัสองค์กร
             2. เลือก **ถ่ายรูปตอนนี้** หรือเลือกรูปจากเครื่อง
-            3. กรอกชื่อ แผนก/สาขา และรหัสสินค้า 13 หลัก
-            4. ตรวจภาพและเลขให้ถูกต้อง แล้วกด **ส่งข้อมูลเข้าบริษัท**
-            5. เห็นเลขรับรายการจึงถือว่าส่งสำเร็จ
+            3. กรอกชื่อ สาขา และรหัสสินค้า 13 หลัก
+            4. เลือกชั้น โซน ทางเดิน ชั้นวาง และพิกัดตารางที่ยืนถ่ายจริง
+            5. ตรวจภาพและเลขให้ถูกต้อง แล้วกด **ส่งข้อมูลเข้าบริษัท**
+            6. หากรหัสเดิมอยู่คนละตำแหน่ง ระบบจะย้ายหมุดปัจจุบันให้อัตโนมัติและเก็บประวัติเดิม
+            7. เห็นเลขรับรายการจึงถือว่าส่งสำเร็จ
             """
         )
     with admin:
@@ -484,8 +593,9 @@ def guide_page() -> None:
             """
             1. เปิดเมนู **รายการที่ส่งแล้ว** และใส่รหัสผู้ดูแล
             2. ค้นหาด้วยบาร์โค้ด ชื่อสินค้า พนักงาน หรือสาขา
-            3. ดาวน์โหลดรายการ CSV หรือเลือกรายการเพื่อดู/ดาวน์โหลดรูป
-            4. สำรองข้อมูล Repository ส่วนตัวเป็นประจำ
+            3. เลือกสินค้าเพื่อดูหมุดปัจจุบันและประวัติการย้ายตำแหน่ง
+            4. ดาวน์โหลดรายการ CSV หรือรูปต้นฉบับไปใช้งานต่อ
+            5. สำรอง Repository ส่วนตัวเป็นประจำ
             """
         )
     with convert:
@@ -516,7 +626,7 @@ def main() -> None:
         return
     pages = {
         "📷 ส่งรูปสินค้า": submission_page,
-        "📥 รายการที่ส่งแล้ว": admin_page,
+        "🗺️ รายการและแผนที่": admin_page,
         "🖼️ PDF → JPG": pdf_jpg_page,
         "📊 PDF → Excel": pdf_excel_page,
         "🔎 JPG → Excel": jpg_excel_page,

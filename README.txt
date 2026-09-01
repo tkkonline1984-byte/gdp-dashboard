@@ -1,4 +1,4 @@
-TKK ONLINE Product Intake & Conversion Hub v2.0.0 UPDATE
+TKK ONLINE Product Intake & Conversion Hub v2.1.0 UPDATE
 ========================================================
 
 เริ่มใช้งานบน Windows
@@ -8,8 +8,8 @@ TKK ONLINE Product Intake & Conversion Hub v2.0.0 UPDATE
 4. เปิดระบบด้วย run.bat
 
 เมนูหลัก
-- ส่งรูปสินค้า + รหัส 13 หลัก
-- รายการที่ส่งแล้วสำหรับผู้ดูแล
+- ส่งรูปสินค้า + รหัส 13 หลัก + ตำแหน่งบนแผนที่ร้าน
+- รายการ แผนที่ปัจจุบัน และประวัติการย้ายสำหรับผู้ดูแล
 - PDF to JPG
 - PDF to Excel
 - JPG to Excel

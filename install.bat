@@ -1,10 +1,10 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title TKK ONLINE Installer v2.0.0
+title TKK ONLINE Installer v2.1.0
 
 echo ==========================================================
-echo   TKK ONLINE Installer v2.0.0
+echo   TKK ONLINE Installer v2.1.0
 echo ==========================================================
 
 set "TKK_PYTHON="
