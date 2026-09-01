@@ -1,5 +1,10 @@
 .venv/
 __pycache__/
-outputs/*
-!outputs/.gitkeep
+*.py[cod]
+.pytest_cache/
+.streamlit/secrets.toml
+local_submissions/
+outputs/
 outputs.zip
+products/
+*.part

@@ -1,139 +1,63 @@
-﻿@echo off
+@echo off
 setlocal EnableExtensions
-chcp 65001 >nul
 cd /d "%~dp0"
-title TKK ONLINE - Auto Product Frame
+title TKK ONLINE Product Intake Hub v2.0.0
 
 echo ==========================================================
-echo   TKK ONLINE - Background Remove + Auto Frame
+echo   TKK ONLINE Product Intake and Conversion Hub v2.0.0
 echo ==========================================================
 echo.
 
-if not exist "products" mkdir "products"
-
-REM ----------------------------------------------------------
-REM 1. Find Python
-REM ----------------------------------------------------------
-set "PY_CMD="
-
-where py >nul 2>nul
-if %errorlevel%==0 (
-    set "PY_CMD=py -3"
-) else (
-    where python >nul 2>nul
-    if %errorlevel%==0 (
-        set "PY_CMD=python"
-    )
+if not exist ".streamlit\secrets.toml" (
+  copy /y ".streamlit\secrets.toml.example" ".streamlit\secrets.toml" >nul
+  echo [ACTION REQUIRED] Configure .streamlit\secrets.toml first.
+  start "" notepad ".streamlit\secrets.toml"
+  pause
+  exit /b 2
 )
 
-REM ----------------------------------------------------------
-REM 2. If Python is missing, try Winget install automatically
-REM ----------------------------------------------------------
-if not defined PY_CMD (
-    echo [SETUP] ไม่พบ Python ในเครื่อง
-    echo [SETUP] กำลังลองติดตั้ง Python ผ่าน winget...
-    echo.
+set "TKK_PYTHON="
+where python >nul 2>nul
+if not errorlevel 1 set "TKK_PYTHON=python"
 
-    where winget >nul 2>nul
-    if %errorlevel% neq 0 (
-        echo [ERROR] เครื่องนี้ไม่มี Python และไม่พบ winget
-        echo กรุณาติดตั้ง Python 3 จาก python.org แล้วเปิด run.bat ใหม่
-        echo.
-        pause
-        exit /b 1
-    )
-
-    winget install --id Python.Python.3.12 -e --accept-source-agreements --accept-package-agreements
-
-    REM Refresh common Python locations after install
-    set "PATH=%LOCALAPPDATA%\Programs\Python\Python312;%LOCALAPPDATA%\Programs\Python\Python312\Scripts;%PATH%"
-
-    where py >nul 2>nul
-    if %errorlevel%==0 (
-        set "PY_CMD=py -3"
-    ) else (
-        where python >nul 2>nul
-        if %errorlevel%==0 (
-            set "PY_CMD=python"
-        )
-    )
-
-    if not defined PY_CMD (
-        echo.
-        echo [ERROR] ติดตั้ง Python แล้วแต่ระบบยังไม่พบคำสั่ง Python
-        echo กรุณาปิดหน้าต่างนี้แล้วดับเบิลคลิก run.bat ใหม่อีกครั้ง
-        echo.
-        pause
-        exit /b 1
-    )
+if not defined TKK_PYTHON (
+  where py >nul 2>nul
+  if not errorlevel 1 set "TKK_PYTHON=py -3"
 )
 
-REM ----------------------------------------------------------
-REM 3. Create isolated virtual environment
-REM ----------------------------------------------------------
+if not defined TKK_PYTHON (
+  echo [ERROR] Python was not found.
+  echo Install Python 3.12 or 3.13 from https://python.org
+  pause
+  exit /b 1
+)
+
 if not exist ".venv\Scripts\python.exe" (
-    echo [SETUP] กำลังสร้างสภาพแวดล้อม Python...
-    %PY_CMD% -m venv ".venv"
-    if errorlevel 1 goto :ERROR
+  echo [1/4] Creating a private Python environment...
+  %TKK_PYTHON% -m venv ".venv"
+  if errorlevel 1 goto :FAILED
 )
 
-call ".venv\Scripts\activate.bat"
-if errorlevel 1 goto :ERROR
-
-REM ----------------------------------------------------------
-REM 4. Install libraries only when required
-REM ----------------------------------------------------------
-python -c "import cv2, numpy, PIL; assert hasattr(cv2,'ximgproc')" >nul 2>nul
+echo [2/4] Checking application packages...
+".venv\Scripts\python.exe" -c "import streamlit,fitz,pdfplumber,openpyxl,reportlab,pytesseract" >nul 2>nul
 if errorlevel 1 (
-    echo [SETUP] กำลังติดตั้งไลบรารีที่จำเป็น...
-    python -m pip install --upgrade pip
-    if errorlevel 1 goto :ERROR
-
-    python -m pip install -r requirements.txt
-    if errorlevel 1 goto :ERROR
-) else (
-    echo [SETUP] ไลบรารีพร้อมใช้งานแล้ว
+  ".venv\Scripts\python.exe" -m pip install --upgrade pip
+  if errorlevel 1 goto :FAILED
+  ".venv\Scripts\python.exe" -m pip install -r requirements.txt
+  if errorlevel 1 goto :FAILED
 )
 
-REM ----------------------------------------------------------
-REM 5. Check frame
-REM ----------------------------------------------------------
-if not exist "frame.png" (
-    echo.
-    echo [ERROR] ไม่พบ frame.png
-    echo กรุณาวางไฟล์กรอบชื่อ frame.png ในโฟลเดอร์นี้
-    echo.
-    pause
-    exit /b 1
-)
+echo [3/4] Running safe self-test...
+".venv\Scripts\python.exe" self_test.py
+if errorlevel 1 goto :FAILED
 
-REM ----------------------------------------------------------
-REM 6. Run
-REM ----------------------------------------------------------
-echo.
-echo [RUN] เริ่มประมวลผลรูปสินค้า...
-echo.
-python "batch_tkk_frame.py"
-if errorlevel 1 goto :ERROR
+echo [4/4] Starting the application at http://127.0.0.1:8501
+start "" http://127.0.0.1:8501
+".venv\Scripts\python.exe" -m streamlit run streamlit_app.py --server.address 127.0.0.1 --server.port 8501
+exit /b %errorlevel%
 
+:FAILED
 echo.
-echo ==========================================================
-echo   เสร็จแล้ว
-echo   - ดูรูปที่โฟลเดอร์ outputs
-echo   - ไฟล์รวมอยู่ที่ outputs.zip
-echo ==========================================================
-echo.
-
-if exist "outputs" start "" explorer "%CD%\outputs"
-pause
-exit /b 0
-
-:ERROR
-echo.
-echo ==========================================================
-echo   เกิดข้อผิดพลาด
-echo ==========================================================
-echo กรุณาดูข้อความ ERROR ด้านบน
-echo.
+echo [ERROR] Setup or self-test failed. Copy the error above for support.
 pause
 exit /b 1

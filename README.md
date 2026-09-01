@@ -1,19 +1,50 @@
-# :earth_americas: GDP dashboard template
+# TKK ONLINE Product Intake & Conversion Hub
 
-A simple Streamlit app showing the GDP of different countries in the world.
+ระบบภายในองค์กรสำหรับรับรูปสินค้าและรหัสสินค้า 13 หลักจากพนักงาน พร้อมเครื่องมือแปลงเอกสารในหน้าเดียว ออกแบบให้ใช้ได้ทั้งมือถือและคอมพิวเตอร์
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://gdp-dashboard-template.streamlit.app/)
+## ความสามารถ
 
-### How to run it on your own machine
+- พนักงานถ่ายรูปจากกล้องมือถือหรือเลือกรูปจากเครื่อง
+- ตรวจรหัสสินค้า 13 หลัก และตรวจ Check Digit แบบ EAN-13
+- บันทึกรูป JPG คุณภาพสูงและข้อมูล JSON แบบ Atomic
+- ชื่อไฟล์ไม่ชนกันเมื่อพนักงานหลายคนส่งพร้อมกัน
+- หน้าผู้ดูแลค้นหา ดูรูป ดาวน์โหลดรูป และดาวน์โหลดรายการ CSV
+- PDF → JPG (ZIP)
+- PDF → Excel (ดึงตาราง/ข้อความ และ OCR สำหรับ PDF สแกน)
+- JPG/PNG → Excel (OCR ไทย+อังกฤษ)
+- Excel → PDF (ทุก Worksheet พร้อมหัวตารางซ้ำทุกหน้า)
+- มีรหัสเข้าใช้งานพนักงานและรหัสผู้ดูแลแยกกัน
+- ป้องกันการบันทึกข้อมูลภายในลงพื้นที่สาธารณะโดยค่าเริ่มต้น
 
-1. Install the requirements
+## เริ่มใช้งานบน Windows
 
-   ```
-   $ pip install -r requirements.txt
-   ```
+1. ติดตั้ง Python 3.12 หรือ 3.13 แบบ 64-bit
+2. แตก ZIP โครงการทั้งหมด ห้ามคัดลอกเฉพาะบางไฟล์
+3. ดับเบิลคลิก `install.bat` ครั้งแรก
+4. เปิดโหมดทดสอบด้วย `run.bat`
 
-2. Run the app
+`install.bat` จะสร้าง `.venv`, ติดตั้ง Package และรัน Self-test ส่วน `run.bat` เปิดระบบที่ `http://127.0.0.1:8501`
 
-   ```
-   $ streamlit run streamlit_app.py
-   ```
+การตั้งค่าระบบจริงและข้อมูลการเชื่อมต่อให้ดำเนินการตามคู่มือภายในของบริษัทโดยผู้ดูแลที่ได้รับอนุญาตเท่านั้น
+
+## ข้อจำกัดที่ควรรู้
+
+- OCR อาจอ่านผิดเมื่อรูปเบลอ เอียง แสงสะท้อน หรือตารางซับซ้อน จึงต้องตรวจไฟล์ Excel ก่อนใช้งานจริง
+- PDF/JPG/Excel ใช้ประมวลผลชั่วคราวและไม่ถูกบันทึกลง Submission โดยอัตโนมัติ
+- จำกัด Upload 30 MB, PDF 50 หน้า และ Excel 10,000 แถวต่อ Worksheet ต่อครั้ง
+- ห้ามนำข้อมูลพนักงานหรือข้อมูลภายในมาใช้ในสภาพแวดล้อมทดสอบสาธารณะ
+
+## ทดสอบ
+
+```bash
+python self_test.py
+python -m unittest discover -s tests -v
+```
+
+Windows สามารถดับเบิลคลิก `run_tests.bat`
+
+## โปรแกรมใส่กรอบรูปเดิม
+
+ฟังก์ชันเดิมยังเก็บไว้ที่ `batch_tkk_frame.py` และเปิดด้วย `run_batch_frame.bat`
+
+Version: `2.0.0 UPDATE`
