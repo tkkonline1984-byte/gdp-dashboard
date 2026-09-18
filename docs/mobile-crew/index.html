@@ -1,198 +1,162 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0b0f14">
-  <title>TKK ONLINE • Mobile Crew</title>
-  <style>
-    :root{
-      --bg:#0b0f14;--panel:#121923;--panel2:#182231;--line:rgba(255,255,255,.09);
-      --text:#f8fbff;--muted:#9bb0c7;--orange:#ff7a00;--cyan:#35e8d1;--lime:#c6ff4a;
-      --danger:#ff4d67;--warn:#ffc857;--ok:#37e78a;--r:24px
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:
-      radial-gradient(circle at 10% -10%,rgba(255,122,0,.18),transparent 34%),
-      radial-gradient(circle at 100% 0,rgba(53,232,209,.12),transparent 30%),var(--bg);
-      color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-    body{min-height:100vh}
-    .wrap{max-width:980px;margin:auto;padding:14px 14px 96px}
-    .hero,.card{background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018));
-      border:1px solid var(--line);border-radius:var(--r);box-shadow:0 18px 60px rgba(0,0,0,.26);backdrop-filter:blur(18px)}
-    .hero{padding:20px;position:relative;overflow:hidden}
-    .hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;
-      background:rgba(198,255,74,.09);right:-50px;top:-70px;filter:blur(10px)}
-    .brand{display:flex;align-items:center;gap:10px}.logo{width:46px;height:46px;border-radius:15px;
-      background:linear-gradient(135deg,var(--orange),#ffae4d);display:grid;place-items:center;font-weight:1000;color:#111}
-    h1{margin:14px 0 4px;font-size:clamp(31px,8vw,50px);line-height:1;font-weight:1000}
-    .sub{color:var(--muted);font-size:14px}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-    .chip{padding:8px 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:12px;font-weight:900}
-    .section-title{font-size:22px;font-weight:1000;margin:24px 2px 10px}
-    .card{padding:15px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
-    .metric{padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:18px}
-    .metric b{display:block;font-size:18px;margin-top:4px}.metric span{color:var(--muted);font-size:11px}
-    button,input,select{font:inherit}.btn{border:0;border-radius:18px;min-height:54px;padding:0 16px;font-weight:1000;
-      color:#111;background:#fff;cursor:pointer;transition:.15s transform,.15s opacity}
-    .btn:active{transform:scale(.985)}.btn:disabled{opacity:.35;cursor:not-allowed}
-    .primary{background:linear-gradient(135deg,var(--orange),#ffb354)}.cyan{background:linear-gradient(135deg,var(--cyan),#9afff1)}
-    .lime{background:linear-gradient(135deg,var(--lime),#ebffaf)}.dark{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
-    .danger{background:linear-gradient(135deg,#ff7186,var(--danger));color:white}
-    .field{width:100%;min-height:56px;border-radius:18px;border:1px solid var(--line);background:#0f151e;color:var(--text);
-      padding:0 16px;outline:none}.field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(53,232,209,.13)}
-    .status{font-size:14px;font-weight:900}.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--danger)}
-    .notice{padding:12px 14px;border-radius:16px;background:rgba(255,200,87,.08);border:1px solid rgba(255,200,87,.2);font-size:13px;color:#ffe3a0}
-    .suggestions{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-    .suggest{padding:13px;border:1px solid var(--line);background:var(--panel);border-radius:17px;cursor:pointer}
-    .suggest b{display:block}.suggest small{color:var(--muted)}
-    .searchrow{display:grid;grid-template-columns:1fr auto;gap:8px}.searchrow .btn{min-width:106px}
-    .frame-wrap{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:white;min-height:430px}
-    iframe{width:100%;height:68vh;min-height:430px;border:0;background:white}
-    .tiny{font-size:12px;color:var(--muted)}.hidden{display:none!important}
-    .bottom{position:fixed;left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));z-index:30;
-      max-width:956px;margin:auto;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;border:1px solid var(--line);
-      border-radius:20px;background:rgba(10,15,22,.92);backdrop-filter:blur(20px)}
-    @media(max-width:640px){.metrics{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}.suggestions{grid-template-columns:1fr}
-      .searchrow{grid-template-columns:1fr}.searchrow .btn{width:100%}.grid{grid-template-columns:1fr}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#081018">
+<title>TKK ONLINE • ลงเวลาการทำงาน</title>
+<style>
+:root{--bg:#081018;--card:#111c28;--card2:#172638;--line:rgba(255,255,255,.09);--text:#f8fbff;--muted:#9fb2c6;--orange:#ff7a00;--cyan:#35ead4;--lime:#c7ff48;--red:#ff4e6a;--yellow:#ffc857;--green:#32e889}
+*{box-sizing:border-box}html,body{margin:0;background:radial-gradient(circle at 10% -10%,rgba(255,122,0,.18),transparent 34%),radial-gradient(circle at 100% 0,rgba(53,234,212,.12),transparent 28%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{min-height:100vh}.wrap{max-width:900px;margin:auto;padding:14px 14px 100px}.hero,.card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border-radius:26px;box-shadow:0 18px 60px rgba(0,0,0,.25);backdrop-filter:blur(18px)}
+.hero{padding:20px}.brand{display:flex;align-items:center;gap:11px}.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--orange),#ffbd63);display:grid;place-items:center;color:#101010;font-weight:1000}.brand b{font-size:15px}.muted{color:var(--muted);font-size:13px}
+h1{font-size:clamp(30px,8vw,48px);line-height:1.02;margin:17px 0 7px;font-weight:1000}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.chip{border:1px solid var(--line);background:var(--card2);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900}
+.title{font-size:22px;font-weight:1000;margin:24px 2px 10px}.card{padding:15px;margin-bottom:12px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px}.metric span{display:block;color:var(--muted);font-size:11px}.metric b{display:block;font-size:18px;margin-top:4px}
+button,input,select{font:inherit}.field{width:100%;min-height:56px;border-radius:17px;border:1px solid var(--line);background:#0e1722;color:var(--text);padding:0 15px;outline:none}.field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(53,234,212,.12)}
+.btn{min-height:55px;border:0;border-radius:18px;padding:0 15px;font-weight:1000;cursor:pointer;background:white;color:#111;transition:.15s}.btn:active{transform:scale(.985)}.btn:disabled{opacity:.32;cursor:not-allowed}.orange{background:linear-gradient(135deg,var(--orange),#ffb55c)}.cyan{background:linear-gradient(135deg,var(--cyan),#a0fff2)}.lime{background:linear-gradient(135deg,var(--lime),#eaffaf)}.dark{background:var(--card2);color:var(--text);border:1px solid var(--line)}.danger{background:linear-gradient(135deg,#ff7c91,var(--red));color:white}
+.notice{margin-top:10px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,200,87,.24);background:rgba(255,200,87,.08);color:#ffe0a0;font-size:13px;font-weight:800}.notice.red{border-color:rgba(255,78,106,.45);background:rgba(255,78,106,.13);color:#ffd6de;animation:pulse 1s infinite alternate}@keyframes pulse{from{box-shadow:0 0 0 rgba(255,78,106,0)}to{box-shadow:0 0 24px rgba(255,78,106,.27)}}
+.hidden{display:none!important}.rules{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.rule{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:11px}.rule b{display:block;margin-bottom:4px}.rule small{color:var(--muted)}
+.settings{margin-top:10px;padding:13px;border-radius:18px;background:#0e1722;border:1px solid var(--line)}.settings .grid2{margin-bottom:8px}.settings label{font-size:12px;color:var(--muted);font-weight:800}.settings input{margin-top:5px}
+.statusline{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap}.timer{font-size:39px;font-weight:1000;letter-spacing:-1px}.green{color:var(--green)}.yellow{color:var(--yellow)}.redtxt{color:var(--red)}
+.product{border:1px solid var(--line);border-radius:20px;overflow:hidden;background:white}.product iframe{width:100%;height:64vh;min-height:440px;border:0}.bottom{position:fixed;left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));z-index:20;max-width:876px;margin:auto;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;border:1px solid var(--line);border-radius:20px;background:rgba(8,16,24,.92);backdrop-filter:blur(20px)}
+@media(max-width:620px){.metrics{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}.grid2,.rules{grid-template-columns:1fr}.wrap{padding-left:11px;padding-right:11px}}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <section class="hero">
-    <div class="brand"><div class="logo">TKK</div><div><b>TKK ONLINE • MOBILE CREW</b><div class="sub">ลงเวลา + หาสินค้า • Gen Alpha</div></div></div>
-    <h1>งานวันนี้ ⚡</h1>
-    <div class="sub" id="today">กำลังโหลด...</div>
-    <div class="chips"><span class="chip" id="employeeChip">ยังไม่เลือกพนักงาน</span><span class="chip" id="stateChip">⚪ ยังไม่เข้างาน</span></div>
-  </section>
+<section class="hero">
+ <div class="brand"><div class="logo">TKK</div><div><b>TKK ONLINE • ลงเวลาการทำงาน</b><div class="muted">Mobile Crew • Gen Alpha UI</div></div></div>
+ <h1>งานวันนี้ ⚡</h1>
+ <div class="muted" id="today"></div>
+ <div class="chips"><span class="chip" id="empChip">ยังไม่เลือกพนักงาน</span><span class="chip" id="stateChip">⚪ ยังไม่เข้างาน</span></div>
+</section>
 
-  <div class="section-title">👤 พนักงาน</div>
-  <section class="card">
-    <div class="grid">
-      <input id="employee" class="field" placeholder="ชื่อหรือเบอร์โทรพนักงาน">
-      <button class="btn cyan" id="saveEmployee">ใช้ชื่อนี้</button>
-    </div>
-    <div class="tiny" style="margin-top:8px">การแนะนำสินค้าแยกตามพนักงานแต่ละคนบนอุปกรณ์นี้</div>
-  </section>
+<div class="title">👤 พนักงาน</div>
+<section class="card">
+ <div class="grid2"><input id="employee" class="field" placeholder="รหัสพนักงาน / ชื่อพนักงาน"><button class="btn cyan" id="saveEmp">เริ่มใช้งานชื่อนี้</button></div>
+ <div class="muted" style="margin-top:8px">ใช้รหัสหรือชื่อเดิมทุกครั้ง เพื่อให้ประวัติของแต่ละคนไม่ปะปนกัน</div>
+</section>
 
-  <div class="section-title">⏱ ลงเวลาการทำงาน</div>
-  <section class="card">
-    <div class="metrics">
-      <div class="metric"><span>เข้างาน</span><b id="clockIn">--:--</b></div>
-      <div class="metric"><span>พักกลางวัน</span><b id="lunchUsed">0/45 นาที</b></div>
-      <div class="metric"><span>พักย่อย</span><b id="shortUsed">0/10 นาที</b></div>
-    </div>
-    <div class="grid" style="margin-top:12px">
-      <button class="btn primary" id="btnIn">🟢 เข้างาน</button>
-      <button class="btn dark" id="btnShort">☕ พักย่อย</button>
-      <button class="btn dark" id="btnLunch">🍱 พักกลางวัน</button>
-      <button class="btn dark" id="btnOutside">🚶 ออกไปข้างนอก</button>
-      <button class="btn lime" id="btnBack">↩️ กลับเข้าทำงาน</button>
-      <button class="btn danger" id="btnOut">🏁 ออกงาน</button>
-    </div>
-    <div id="attendanceNotice" class="notice hidden" style="margin-top:10px"></div>
-  </section>
+<div class="title">⏱ สถานะการทำงาน</div>
+<section class="card">
+ <div class="statusline"><div><div class="muted">สถานะปัจจุบัน</div><b id="statusText">ยังไม่เข้างาน</b></div><div class="timer" id="liveClock">--:--:--</div></div>
+ <div class="metrics" style="margin-top:12px">
+  <div class="metric"><span>เข้างานวันนี้</span><b id="clockIn">--:--</b></div>
+  <div class="metric"><span>พักกลางวันสะสม</span><b id="lunchUsed">0/45 นาที</b></div>
+  <div class="metric"><span>พักย่อยรอบนี้</span><b id="shortUsed">0/10 นาที</b></div>
+ </div>
+ <div class="grid2" style="margin-top:12px">
+  <button class="btn orange" id="btnIn">🟢 เข้างาน</button>
+  <button class="btn dark" id="btnShort">☕ พักย่อย</button>
+  <button class="btn dark" id="btnLunch">🍱 พักกลางวัน</button>
+  <button class="btn dark" id="btnOutside">🚶 ออกไปข้างนอก</button>
+  <button class="btn lime" id="btnBack">↩️ กลับเข้าทำงาน</button>
+  <button class="btn danger" id="btnOut">🔴 ออกงาน</button>
+ </div>
+ <div id="alertBox" class="notice hidden"></div>
+</section>
 
-  <div class="section-title">✨ สำหรับคุณ</div>
-  <section class="card">
-    <div class="sub" style="margin-bottom:10px">ระบบจำสิ่งที่แต่ละคนค้นล่าสุดและค้นบ่อย แล้วเอาขึ้นก่อนอัตโนมัติ</div>
-    <div id="suggestions" class="suggestions"></div>
-  </section>
+<div class="title">📋 กฎเวลาวันนี้</div>
+<section class="card">
+ <div class="rules">
+  <div class="rule"><b>🟢 เข้างาน <span id="ruleStart">08:00</span></b><small>หลังเวลานี้ระบบระบุว่าสาย</small></div>
+  <div class="rule"><b>🔴 ออกงาน <span id="ruleEnd">18:00</span></b><small>ออกก่อนเวลาระบบแจ้งเตือน</small></div>
+  <div class="rule"><b>🍱 พักกลางวัน <span id="ruleLunchWindow">11:00–16:00</span></b><small>พักรวมไม่เกิน <span id="ruleLunchMax">45</span> นาที</small></div>
+  <div class="rule"><b>☕ พักย่อย</b><small>แต่ละรอบไม่เกิน <span id="ruleShortMax">10</span> นาที</small></div>
+ </div>
+ <button class="btn dark" style="width:100%;margin-top:10px" id="notifyBtn">🔔 เปิดเสียง/สั่นแจ้งเตือน</button>
+</section>
 
-  <div class="section-title">🔎 หาสินค้า</div>
-  <section class="card">
-    <div id="searchLock" class="notice">ลงเวลาเข้างานก่อน แล้วค้นหาสินค้าได้ทันที</div>
-    <div id="searchArea" class="hidden">
-      <div class="searchrow">
-        <input id="query" class="field" placeholder="พิมพ์รหัสสินค้า / รหัสรอง / ชื่อสินค้า">
-        <button class="btn primary" id="searchBtn">ค้นหา</button>
-      </div>
-      <div class="tiny" style="margin:8px 2px 10px">ผลค้นหาจะเปิดในระบบ Mobile Stock เดิม เพื่อใช้ข้อมูลสินค้าเดิมร่วมกัน</div>
-      <div class="frame-wrap">
-        <iframe id="stockFrame" title="TKK Mobile Stock" src="about:blank"></iframe>
-      </div>
-      <div class="grid" style="margin-top:10px">
-        <button class="btn dark" id="openFull">เปิด Mobile Stock เต็มจอ</button>
-        <button class="btn dark" id="clearHistory">ล้างประวัติแนะนำของฉัน</button>
-      </div>
-    </div>
-  </section>
+<div id="adminSection" class="hidden">
+ <div class="title">⚙️ ตั้งค่ากฎการทำงาน</div>
+ <section class="card">
+  <div class="muted" style="margin-bottom:10px">หน้าตั้งค่าผู้ดูแล • ค่าที่บันทึกมีผลกับอุปกรณ์นี้</div>
+  <div class="settings">
+   <div class="grid2">
+    <label>เวลาเข้างาน<input id="setWorkStart" class="field" type="time"></label>
+    <label>เวลาออกงาน<input id="setWorkEnd" class="field" type="time"></label>
+   </div>
+   <div class="grid2">
+    <label>เริ่มช่วงพักกลางวัน<input id="setLunchStart" class="field" type="time"></label>
+    <label>สิ้นสุดช่วงพักกลางวัน<input id="setLunchEnd" class="field" type="time"></label>
+   </div>
+   <div class="grid2">
+    <label>พักกลางวันรวมสูงสุด (นาที)<input id="setLunchMax" class="field" type="number" min="1" max="180"></label>
+    <label>พักย่อยสูงสุด/รอบ (นาที)<input id="setShortMax" class="field" type="number" min="1" max="60"></label>
+   </div>
+   <div class="grid2"><button class="btn orange" id="saveRules">บันทึกกฎ</button><button class="btn dark" id="resetRules">คืนค่า 08:00 / 18:00</button></div>
+  </div>
+ </section>
 </div>
 
-<div class="bottom">
-  <button class="btn dark" onclick="window.scrollTo({top:0,behavior:'smooth'})">⏱ ลงเวลา</button>
-  <button class="btn primary" onclick="document.getElementById('query').scrollIntoView({behavior:'smooth',block:'center'})">🔎 หาสินค้า</button>
+<div class="title">🔎 หาสินค้า</div>
+<section class="card">
+ <div id="stockLock" class="notice">ลงเวลาเข้างานก่อน ระบบค้นหาสินค้าจะเปิดให้อัตโนมัติ</div>
+ <div id="stockArea" class="hidden">
+  <div class="muted" style="margin-bottom:9px">เมื่ออยู่ในสถานะ “กำลังทำงาน” ใช้ Mobile Stock ต่อได้ในหน้าเดียว</div>
+  <div class="product"><iframe id="stockFrame" title="TKK Mobile Stock" src="about:blank"></iframe></div>
+  <button class="btn dark" style="width:100%;margin-top:10px" id="openStock">เปิดหน้าค้นหาสินค้าเต็มจอ</button>
+ </div>
+</section>
 </div>
+
+<div class="bottom"><button class="btn dark" onclick="window.scrollTo({top:0,behavior:'smooth'})">⏱ ลงเวลา</button><button class="btn orange" onclick="document.getElementById('stockArea').scrollIntoView({behavior:'smooth'})">🔎 หาสินค้า</button></div>
 
 <script>
 const STOCK_URL='https://tkk-pos-stock-start.tkkonline1984.chatgpt.site/mobile-stock';
-const RULES={lunchMax:45,shortMax:10,lunchStart:'11:00',lunchEnd:'16:00'};
-const el=id=>document.getElementById(id);
-const now=()=>new Date();
-const hm=d=>d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',hour12:false});
-const dayKey=()=>now().toISOString().slice(0,10);
+const DEFAULT_RULES={workStart:'08:00',workEnd:'18:00',lunchStart:'11:00',lunchEnd:'16:00',lunchMax:45,shortMax:10};
+const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,'0');
 let employee=localStorage.getItem('tkk_employee')||'';
-el('employee').value=employee;
-
-function key(s){return 'tkkcrew:'+encodeURIComponent(employee||'anonymous')+':'+s}
-function loadEvents(){try{return JSON.parse(localStorage.getItem(key('events:'+dayKey()))||'[]')}catch{return[]}}
-function saveEvents(v){localStorage.setItem(key('events:'+dayKey()),JSON.stringify(v))}
-function addEvent(type){const ev=loadEvents();ev.push({type,at:Date.now()});saveEvents(ev);render()}
-function state(){
- const ev=loadEvents(); if(!ev.length)return 'not_in'; const t=ev[ev.length-1].type;
- if(t==='out')return 'out'; if(t==='short_start')return 'short'; if(t==='lunch_start')return 'lunch'; if(t==='outside_start')return 'outside'; return 'work';
+let audioReady=false,lastAlertCode='';
+function dateKey(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function hhmm(d=new Date()){return pad(d.getHours())+':'+pad(d.getMinutes())}
+function secondsClock(){const d=new Date();return hhmm(d)+':'+pad(d.getSeconds())}
+function empKey(s){return 'tkkattendance:'+encodeURIComponent(employee||'anonymous')+':'+s}
+function getRules(){try{return {...DEFAULT_RULES,...JSON.parse(localStorage.getItem('tkk_attendance_rules')||'{}')}}catch{return {...DEFAULT_RULES}}}
+function setRules(r){localStorage.setItem('tkk_attendance_rules',JSON.stringify(r))}
+function events(){try{return JSON.parse(localStorage.getItem(empKey('events:'+dateKey()))||'[]')}catch{return[]}}
+function saveEvents(a){localStorage.setItem(empKey('events:'+dateKey()),JSON.stringify(a))}
+function add(type){const a=events();a.push({type,at:Date.now()});saveEvents(a);lastAlertCode='';render()}
+function state(){const a=events();if(!a.length)return'notin';const t=a[a.length-1].type;if(t==='out')return'out';if(t==='short_start')return'short';if(t==='lunch_start')return'lunch';if(t==='outside_start')return'outside';return'work'}
+function currentOpenMinutes(startType){const a=events();let start=null;for(const e of a){if(e.type===startType)start=e.at;if(e.type==='back'&&start)start=null}return start?(Date.now()-start)/60000:0}
+function lunchTotal(){const a=events();let start=null,total=0;for(const e of a){if(e.type==='lunch_start')start=e.at;if(e.type==='back'&&start){total+=(e.at-start)/60000;start=null}}if(start)total+=(Date.now()-start)/60000;return total}
+function beep(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.value=.08;o.connect(g);g.connect(c.destination);o.start();setTimeout(()=>{o.stop();c.close()},240)}catch{}}
+function urgent(code,msg){const box=$('alertBox');box.textContent=msg;box.className='notice red';if(lastAlertCode!==code){lastAlertCode=code;if(audioReady)beep();if(navigator.vibrate)navigator.vibrate([250,120,250]);}}
+function clearUrgent(){const b=$('alertBox');b.className='notice hidden';b.textContent=''}
+function validateLive(){const r=getRules(),s=state(),lm=lunchTotal(),sm=currentOpenMinutes('short_start'),now=hhmm();
+ if(s==='lunch'&&lm>Number(r.lunchMax))return urgent('lunch-max','⚠️ พักกลางวันเกิน '+r.lunchMax+' นาทีแล้ว กรุณากลับเข้าทำงานทันที');
+ if(s==='lunch'&&now>r.lunchEnd)return urgent('lunch-end','⚠️ เลยเวลาพักกลางวัน '+r.lunchEnd+' แล้ว กรุณากลับเข้าทำงานทันที');
+ if(s==='short'&&sm>Number(r.shortMax))return urgent('short-max','⚠️ พักย่อยเกิน '+r.shortMax+' นาทีแล้ว กรุณากลับเข้าทำงานทันที');
+ clearUrgent();
 }
-function pairMinutes(startType,endType){
- const ev=loadEvents(); let start=null,total=0;
- for(const e of ev){if(e.type===startType)start=e.at; if(e.type===endType&&start){total+=(e.at-start)/60000;start=null}}
- if(start)total+=(Date.now()-start)/60000; return Math.max(0,total);
-}
-function recordQuery(q){
- q=(q||'').trim(); if(!q)return;
- const k=key('queries'); let arr=[]; try{arr=JSON.parse(localStorage.getItem(k)||'[]')}catch{}
- arr.push({q,at:Date.now()}); localStorage.setItem(k,JSON.stringify(arr.slice(-300))); renderSuggestions();
-}
-function rankedQueries(){
- let arr=[]; try{arr=JSON.parse(localStorage.getItem(key('queries'))||'[]')}catch{}
- const m=new Map(), t=Date.now();
- for(const x of arr){const q=(x.q||'').trim();if(!q)continue; const age=(t-x.at)/86400000; const rec=age<=1?8:age<=7?4:age<=30?2:0;
-   const v=m.get(q)||{q,count:0,score:0,last:0};v.count++;v.score+=2+rec;v.last=Math.max(v.last,x.at);m.set(q,v)}
- return [...m.values()].sort((a,b)=>b.score-a.score||b.last-a.last).slice(0,10);
-}
-function renderSuggestions(){
- const box=el('suggestions'), list=rankedQueries(); box.innerHTML='';
- if(!employee){box.innerHTML='<div class="tiny">เลือกพนักงานก่อน</div>';return}
- if(!list.length){box.innerHTML='<div class="tiny">เริ่มค้นหาสินค้า ระบบจะเรียนรู้และจัดอันดับให้แต่ละคนเอง</div>';return}
- list.forEach((x,i)=>{const d=document.createElement('div');d.className='suggest';d.innerHTML='<b>#'+(i+1)+' '+x.q+'</b><small>ค้น '+x.count+' ครั้ง • เรียงจากความถี่ + ล่าสุด</small>';
-   d.onclick=()=>doSearch(x.q);box.appendChild(d)})
-}
-function doSearch(q){
- if(state()!=='work'){el('attendanceNotice').classList.remove('hidden');el('attendanceNotice').textContent='ต้องอยู่ในสถานะกำลังทำงานก่อนจึงค้นสินค้าได้';return}
- q=(q||el('query').value||'').trim(); if(!q)return; el('query').value=q; recordQuery(q);
- const u=STOCK_URL+'?q='+encodeURIComponent(q); el('stockFrame').src=u;
-}
+function renderRules(){const r=getRules();$('ruleStart').textContent=r.workStart;$('ruleEnd').textContent=r.workEnd;$('ruleLunchWindow').textContent=r.lunchStart+'–'+r.lunchEnd;$('ruleLunchMax').textContent=r.lunchMax;$('ruleShortMax').textContent=r.shortMax;
+ ['WorkStart','WorkEnd','LunchStart','LunchEnd','LunchMax','ShortMax'].forEach(k=>{const key=k[0].toLowerCase()+k.slice(1);$('set'+k).value=r[key]})}
 function render(){
- employee=localStorage.getItem('tkk_employee')||employee;
- el('employeeChip').textContent=employee||'ยังไม่เลือกพนักงาน';
- el('today').textContent=now().toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' • '+hm(now());
- const s=state(), labels={not_in:'⚪ ยังไม่เข้างาน',work:'🟢 กำลังทำงาน',short:'☕ พักย่อย',lunch:'🍱 พักกลางวัน',outside:'🚶 ออกไปข้างนอก',out:'🔴 ออกงานแล้ว'};
- el('stateChip').textContent=labels[s];
- const ev=loadEvents(), cin=ev.find(x=>x.type==='in'); el('clockIn').textContent=cin?hm(new Date(cin.at)):'--:--';
- const lm=pairMinutes('lunch_start','back'), sm=pairMinutes('short_start','back'); el('lunchUsed').textContent=Math.floor(lm)+'/'+RULES.lunchMax+' นาที';el('shortUsed').textContent=Math.floor(sm)+'/'+RULES.shortMax+' นาที';
- const note=el('attendanceNotice'); note.classList.add('hidden');
- if(lm>RULES.lunchMax){note.classList.remove('hidden');note.textContent='⚠️ พักกลางวันเกิน '+RULES.lunchMax+' นาทีแล้ว'}
- if(sm>RULES.shortMax){note.classList.remove('hidden');note.textContent='⚠️ พักย่อยเกิน '+RULES.shortMax+' นาทีแล้ว'}
- el('btnIn').disabled=!employee||s!=='not_in'; el('btnShort').disabled=s!=='work'; el('btnLunch').disabled=s!=='work';el('btnOutside').disabled=s!=='work';el('btnBack').disabled=!['short','lunch','outside'].includes(s);el('btnOut').disabled=s!=='work';
- const ok=s==='work'; el('searchLock').classList.toggle('hidden',ok);el('searchArea').classList.toggle('hidden',!ok);
- if(ok&&el('stockFrame').src==='about:blank')el('stockFrame').src=STOCK_URL;
- renderSuggestions();
+ const r=getRules(),s=state(),a=events(),cin=a.find(x=>x.type==='in'),lm=lunchTotal(),sm=currentOpenMinutes('short_start');
+ $('liveClock').textContent=secondsClock();$('today').textContent=new Date().toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ $('empChip').textContent=employee||'ยังไม่เลือกพนักงาน';
+ const labels={notin:'⚪ ยังไม่เข้างาน',work:'🟢 กำลังทำงาน',short:'☕ พักย่อย',lunch:'🍱 พักกลางวัน',outside:'🚶 ออกไปข้างนอก',out:'🔴 ออกงานแล้ว'};
+ $('stateChip').textContent=labels[s];$('statusText').textContent=labels[s].replace(/^.. /,'');
+ $('clockIn').textContent=cin?hhmm(new Date(cin.at)):'--:--';$('lunchUsed').textContent=Math.floor(lm)+'/'+r.lunchMax+' นาที';$('shortUsed').textContent=Math.floor(sm)+'/'+r.shortMax+' นาที';
+ $('btnIn').disabled=!employee||s!=='notin';$('btnShort').disabled=s!=='work';$('btnLunch').disabled=s!=='work';$('btnOutside').disabled=s!=='work';$('btnBack').disabled=!['short','lunch','outside'].includes(s);$('btnOut').disabled=s!=='work';
+ const work=s==='work';$('stockLock').classList.toggle('hidden',work);$('stockArea').classList.toggle('hidden',!work);if(work&&$('stockFrame').src==='about:blank')$('stockFrame').src=STOCK_URL;
+ validateLive();
 }
-el('saveEmployee').onclick=()=>{const v=el('employee').value.trim();if(!v)return;employee=v;localStorage.setItem('tkk_employee',v);render()}
-el('btnIn').onclick=()=>addEvent('in'); el('btnShort').onclick=()=>addEvent('short_start'); el('btnLunch').onclick=()=>{const t=hm(now());if(t<RULES.lunchStart||t>RULES.lunchEnd){alert('พักกลางวันได้ช่วง 11:00–16:00');return}addEvent('lunch_start')};
-el('btnOutside').onclick=()=>addEvent('outside_start'); el('btnBack').onclick=()=>addEvent('back'); el('btnOut').onclick=()=>addEvent('out');
-el('searchBtn').onclick=()=>doSearch(); el('query').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
-el('openFull').onclick=()=>window.open(el('query').value.trim()?STOCK_URL+'?q='+encodeURIComponent(el('query').value.trim()):STOCK_URL,'_blank');
-el('clearHistory').onclick=()=>{if(confirm('ล้างรายการแนะนำของพนักงานคนนี้?')){localStorage.removeItem(key('queries'));renderSuggestions()}};
-render(); setInterval(render,30000);
+$('employee').value=employee;
+$('saveEmp').onclick=()=>{const v=$('employee').value.trim();if(!v)return;employee=v;localStorage.setItem('tkk_employee',v);render()};
+$('btnIn').onclick=()=>{audioReady=true;const r=getRules(),t=hhmm();if(t>r.workStart&& !confirm('ขณะนี้ '+t+' หลังเวลาเข้างาน '+r.workStart+' ระบบจะบันทึกว่าสาย ต้องการเข้างานต่อหรือไม่?'))return;add('in')};
+$('btnShort').onclick=()=>{audioReady=true;add('short_start')};
+$('btnLunch').onclick=()=>{audioReady=true;const r=getRules(),t=hhmm();if(t<r.lunchStart||t>r.lunchEnd){urgent('lunch-window','⚠️ พักกลางวันได้เฉพาะช่วง '+r.lunchStart+'–'+r.lunchEnd);return}if(lunchTotal()>=r.lunchMax){urgent('lunch-used','⚠️ ใช้เวลาพักกลางวันครบ '+r.lunchMax+' นาทีแล้ว');return}add('lunch_start')};
+$('btnOutside').onclick=()=>{audioReady=true;add('outside_start')};
+$('btnBack').onclick=()=>add('back');
+$('btnOut').onclick=()=>{const r=getRules(),t=hhmm();if(t<r.workEnd&&!confirm('ยังไม่ถึงเวลาออกงาน '+r.workEnd+' ต้องการออกงานก่อนเวลาหรือไม่?'))return;add('out')};
+$('notifyBtn').onclick=()=>{audioReady=true;beep();if(navigator.vibrate)navigator.vibrate(180);$('notifyBtn').textContent='✅ เปิดเสียง/สั่นแล้ว'};
+$('openStock').onclick=()=>window.open(STOCK_URL,'_blank');
+$('saveRules').onclick=()=>{const r={workStart:$('setWorkStart').value||'08:00',workEnd:$('setWorkEnd').value||'18:00',lunchStart:$('setLunchStart').value||'11:00',lunchEnd:$('setLunchEnd').value||'16:00',lunchMax:Number($('setLunchMax').value||45),shortMax:Number($('setShortMax').value||10)};setRules(r);renderRules();render();alert('บันทึกกฎเวลาแล้ว')};
+$('resetRules').onclick=()=>{setRules(DEFAULT_RULES);renderRules();render()};
+if(new URLSearchParams(location.search).get('admin')==='1')$('adminSection').classList.remove('hidden');
+renderRules();render();setInterval(render,1000);
 </script>
-</body></html>
+</body>
+</html>
